@@ -10,7 +10,9 @@ const flash = require('express-flash')
 const session = require('express-session')
 const User = require('./models/user')
 const methodOverride = require('method-override')
+const MongoStore = require('connect-mongo')
 const mongoose = require('mongoose');
+
 const mongodbURL = process.env.MONGODB_URI;
 
 mongoose.connect(mongodbURL)
@@ -24,11 +26,17 @@ initializePassport(passport)
 app.set('view-engine', 'ejs')
 app.use(express.urlencoded({ extended: false }))
 app.use(flash())
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI, 
+    ttl: 14 * 24 * 60 * 60 // sessions last 14 days
+  })
 }))
+
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(methodOverride('_method'))
@@ -96,5 +104,9 @@ function checkNotAuthenticated(req, res, next) {
   next()
 }
 
-app.listen(3000)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
 
