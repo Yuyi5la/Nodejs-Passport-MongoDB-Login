@@ -26,6 +26,8 @@ initializePassport(passport)
 app.set('view-engine', 'ejs')
 app.use(express.urlencoded({ extended: false }))
 app.use(flash())
+app.use(express.static('public'));
+
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
