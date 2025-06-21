@@ -43,9 +43,13 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(methodOverride('_method'))
 
-app.get('/', checkAuthenticated, (req, res) => {
-  res.render('index.ejs', { name: req.user.name })
-})
+app.get('/', (req, res) => {
+  if (req.isAuthenticated()) {
+    return res.render('index.ejs', { name: req.user.name });
+  } else {
+    return res.redirect('/register');
+  }
+});
 
 app.get('/login', checkNotAuthenticated, (req, res) => {
   res.render('login.ejs')
